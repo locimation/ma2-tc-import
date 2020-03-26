@@ -22,8 +22,6 @@ return function()
   local seq = Get.handle('Sequence ' .. seqNo);
   if(not seq) then Error("Sequence does not exist"); return; end;
 
-  local seqNo = 1;
-
   while(true) do (function()
 
     local response = http.request('http://localhost:18080/_/MARKER');
@@ -37,6 +35,10 @@ return function()
     end; lastResponse = response;
 
     gma.sleep(0.5); 
+
+  end)() end;
+
+end
 
   end)() end;
 
