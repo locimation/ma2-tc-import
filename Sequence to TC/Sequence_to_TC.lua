@@ -1,3 +1,40 @@
+--[[
+
+  Sequence to Timecode Plugin
+
+  Author: Michael Goodyear
+  Email: michael@locimation.com
+  Version: 1.1
+  
+  Copyright 2020 Locimation Pty Ltd
+
+  Permission is hereby granted, free of charge,
+  to any person obtaining a copy of this software
+  and associated documentation files (the "Software"),
+  to deal in the Software without restriction, including
+  without limitation the rights to use, copy, modify,
+  merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom
+  the Software is furnished to do so, subject to the
+  following conditions:
+
+  The above copyright notice and this permission
+  notice shall be included in all copies or substantial
+  portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY
+  OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT
+  LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS
+  FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO
+  EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE
+  FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN
+  AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+  OTHER DEALINGS IN THE SOFTWARE.
+
+
+]]
+
 local print=gma.echo
 local Get = gma.show.getobj;
 local Prop = gma.show.property;
@@ -22,6 +59,7 @@ end;
 return function()
 
   local execNo = gma.textinput("Executor number to export from", "");
+  if(not execNo) then return; end;
   if(not Get.handle('Exec ' .. execNo)) then Error('Executor does not exist.'); return; end;
 
   local seqNo = getSeqForExec(execNo);
@@ -44,8 +82,10 @@ return function()
         cue[Prop.name(q,j):gsub('\x7C',' ')] = Prop.get(q,j);
       end;
       if(cue.Trig == 'Timecode') then
-        local time = tonumber(cue['Trig Time']);
-        table.insert(events, { cue = i, name = cue.name, time = time, number = cue.number });
+        local time = cue['Trig Time'];
+        local h,m,s = time:match('(%d+)h'), time:match('(%d+)m'), time:match('([0-9.]+)$');
+        local t = (tonumber(h) or 0)*3600 + (tonumber(m) or 0)*60 + (tonumber(s) or 0);
+        table.insert(events, { cue = i, name = cue.name, time = t, number = cue.number });
       end;
     end;
   end;
